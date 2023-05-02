@@ -12,7 +12,7 @@ router.post("/add", async (req, res) => {
     const userExist = await User.findOne({ email: req.body.email, _id :{$ne:req.body.id} });
     try {
         if (userExist) throw new Error("This email is already registered")
-        const { name, email, phone_number, profile_picture, password, type, active, created_on, modified_on } = req.body
+        const { name, email, phone_number, profile_picture, password, type, created_on, modified_on } = req.body
         const user = new User({
             name: name,
             email: email,
@@ -20,7 +20,6 @@ router.post("/add", async (req, res) => {
             profile_picture,
             password: await bcrypt.hash(password, 10),
             type,
-            active,
             created_on: created_on,
             modified_on: modified_on
         })
@@ -45,7 +44,7 @@ router.post("/edit", async (req, res) => {
             const user = await User.findById(req.body.id);
             if(!user) throw new Error("user does not exists");
         
-        const { name, email, phone_number, profile_picture, password, type, active, created_on, modified_on } = req.body
+        const { name, email, phone_number, profile_picture, password, type,  created_on, modified_on } = req.body
         let updatedUser = await  User.findByIdAndUpdate(req.body.id,{
             name: name,
             email: email,
@@ -53,7 +52,6 @@ router.post("/edit", async (req, res) => {
             profile_picture,
             password: await bcrypt.hash(password, 10),
             type,
-            active,
             created_on: created_on,
             modified_on: modified_on
         })
@@ -79,6 +77,16 @@ router.delete("/delete",async (req,res) => {
     }
   
   })
+  router.get("/", async(req, res) =>{
+    try{
+        const users = await User.find();
+
+        res.status(200).json({users});
+
+    }catch(error){
+        res.status(400).json({error: error.message})
+    }
+})
 
 router.post("/signin", async (req, res) => {
     try {
@@ -115,7 +123,7 @@ router.post("/profile-update", async (req, res) => {
     try {
         if (userExist) throw new Error("This email is already registered")
          
-        const { name, email, phone_number, profile_picture, password, type, active, created_on, modified_on } = req.body
+        const { name, email, phone_number, profile_picture, password, type,  created_on, modified_on } = req.body
         let updatedUser = await  User.findByIdAndUpdate(req.user._id,{
             name: name,
             email: email,
@@ -123,7 +131,6 @@ router.post("/profile-update", async (req, res) => {
             profile_picture,
             password: await bcrypt.hash(password, 10),
             type,
-            active,
             created_on: created_on,
             modified_on: modified_on
         })

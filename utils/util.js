@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
-const moment = require("moment/moment")
+const moment = require("moment/moment");
+
+
 
 
 function createJWTTOKEN(user, expiryInHours = 6){
@@ -29,7 +31,7 @@ return myPromise;
 
 
 const userTypes = {
-    USER_TYPE_SUPER_ADMIN: 1,
+    USER_TYPE_SUPER: 1,
     USER_TYPE__STANDARD: 2,
 }
 
