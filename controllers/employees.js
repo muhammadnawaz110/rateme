@@ -1,14 +1,13 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const Employee = require("../models/Employee");
-const User = require("../models/User");
 const router = express.Router()
 const { verifyUser } = require("../middlewares/auth");
 const { userTypes } = require("../utils/util");
 const Department = require("../models/Department");
 
 
-router.use(verifyUser);
+router.use(["/add", "/edit", "/delete", "/search", "/details/:employeeId"], verifyUser);
 
 router.post("/add", async (req, res) => {
     try {
