@@ -12,16 +12,17 @@ router.post("/add", async (req, res) => {
     const userExist = await User.findOne({ email: req.body.email, _id :{$ne:req.body.id} });
     try {
         if (userExist) throw new Error("This email is already registered")
-        const { name, email, phone_number, profile_picture, password, type, created_on, modified_on } = req.body
+        const { name, email, phoneNumber, profilePicture, password, type, createdOn, modifiedOn } = req.body
+        console.log(req.body)
         const user = new User({
             name: name,
             email: email,
-            phone_number,
-            profile_picture,
+            phoneNumber,
+            profilePicture,
             password: await bcrypt.hash(password, 10),
             type,
-            created_on: created_on,
-            modified_on: modified_on
+            createdOn: createdOn,
+            modifiedOn: modifiedOn
         })
         await user.save();
         res.json({ user })
@@ -44,16 +45,16 @@ router.post("/edit", async (req, res) => {
             const user = await User.findById(req.body.id);
             if(!user) throw new Error("user does not exists");
         
-        const { name, email, phone_number, profile_picture, password, type,  created_on, modified_on } = req.body
+        const { name, email, phoneNumber, profilePicture, password, type,  createdOn, modifiedOn } = req.body
         let updatedUser = await  User.findByIdAndUpdate(req.body.id,{
             name: name,
             email: email,
-            phone_number,
-            profile_picture,
+            phoneNumber,
+            profilePicture,
             password: await bcrypt.hash(password, 10),
             type,
-            created_on: created_on,
-            modified_on: modified_on
+            createdOn: createdOn,
+            modifiedOn: modifiedOn
         })
         res.json({ user: updatedUser })
     } catch (error) {
@@ -93,6 +94,7 @@ router.post("/signin", async (req, res) => {
         if (!req.body.email) throw new Error("Email is required");
         if (!req.body.password) throw new Error("password is required")
         const user = await User.findOne({ email: req.body.email })
+        console.log(req.body)
         if (!user) throw new Error("Email or password is incorrect")
         if (!(await bcrypt.compare(req.body.password, user.password)))
             throw new Error('Email or password is incorrect')
@@ -120,19 +122,20 @@ router.get ("/profile", async(req, res) =>{
 
 router.post("/profile-update", async (req, res) => {
     const userExist = await User.findOne({ email: req.body.email, _id: {$ne: req.user._id}});
+    
     try {
         if (userExist) throw new Error("This email is already registered")
          
-        const { name, email, phone_number, profile_picture, password, type,  created_on, modified_on } = req.body
+        const { name, email, phoneNumber, profilePicture, password, type,  createdOn, modifiedOn } = req.body
         let updatedUser = await  User.findByIdAndUpdate(req.user._id,{
             name: name,
             email: email,
-            phone_number,
-            profile_picture,
+            phoneNumber,
+            profilePicture,
             password: await bcrypt.hash(password, 10),
             type,
-            created_on: created_on,
-            modified_on: modified_on
+            createdOn: createdOn,
+            modifiedOn: modifiedOn
         })
         updatedUser = updatedUser.toObject()
         delete updatedUser.password

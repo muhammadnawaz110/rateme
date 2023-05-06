@@ -11,16 +11,16 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required:true,
     },
-    phone_number : {
+    phoneNumber : {
         type: String,
         
     },
-    id_card : {
+    idCard : {
         type: String,
         
     },
    
-    profile_picture : {
+    profilePicture : {
         type: String,
     },
     designation : {
@@ -30,16 +30,16 @@ const employeeSchema = new mongoose.Schema({
         type:Number,
     }
     },
-    department_id:{
+    departmentId:{
         type: mongoose.Schema.Types.ObjectId
     },
        
-    created_on : {
+    createdOn : {
         type: Date,
         default: moment().format("YYYY-MM-DD")
     },
 
-    modified_on : {
+    modifiedOn : {
         type: Date,
         default: moment().format("YYYY-MM-DD")
     },

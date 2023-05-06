@@ -4,12 +4,12 @@ const { stringify } = require("querystring");
 
 
 const departmentSchema = new mongoose.Schema({
-    department_name : {
+    departmentName : {
         type: String,
         
     },
 
-    department_email : {
+    departmentEmail : {
         type: String,
         
     },
@@ -35,18 +35,18 @@ const departmentSchema = new mongoose.Schema({
 
        
 
-    created_on : {
+    createdOn : {
         type: Date,
         default: moment().format("YYYY-MM-DD")
     },
 
-    modified_on : {
+    modifiedOn : {
         type: Date,
         default: moment().format("YYYY-MM-DD")
     },
 
    
-    user_id:{
+    userId:{
         type: mongoose.Schema.Types.ObjectId
     },
 
