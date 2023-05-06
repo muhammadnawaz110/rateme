@@ -16,18 +16,18 @@ router.post("/add", async (req, res) => {
         if (req.user.type !== userTypes.USER_TYPE_SUPER)
             throw new Error("invalid request")
         const {
-            department_name,
-            department_email,
+            departmentName,
+            departmentEmail,
             phone,
             address,
-            user_id
+            userId
         } = req.body
         const department = new Department({
-            department_name,
-            department_email,
+            departmentName,
+            departmentEmail,
             phone,
             address,
-            user_id
+            userId
         })
         await department.save();
         res.json({ department })
@@ -48,19 +48,19 @@ router.post("/edit", async (req, res) => {
         if (!department) throw new Error("department does not exists");
 
 
-        if (req.user.type !== userTypes.USER_TYPE_SUPER && req.user._id.toString() !== department.user_id.toString())
+        if (req.user.type !== userTypes.USER_TYPE_SUPER && req.user._id.toString() !== department.userId.toString())
             throw new Error("invalid request ");
 
         const {
-            department_name,
-            department_email,
+            departmentName,
+            departmentEmail,
             phone,
             address,
 
         } = req.body
         let updatedDepartment = await Department.findByIdAndUpdate(req.body.id, {
-            department_name,
-            department_email,
+            departmentName,
+            departmentEmail,
             phone,
             address,
 
@@ -72,18 +72,16 @@ router.post("/edit", async (req, res) => {
 });
 
 router.delete("/delete", async (req, res) => {
-    console.log(req.body.id)
     try {
         if (!req.body.id) throw new Error("User id is required")
         if (!mongoose.isValidObjectId(req.body.id)) throw new Error("user id is invalid")
-
-        const department = await User.findById(req.body.id)
+        
+        
+        const department = await Department.findById(req.body.id)
         if (!department) throw new Error("Department does not exists")
 
-        //   department.user_id = "6450f4b511b84d82a04fa36e"
-        if (req.user._id.toString() !== department.user_id.toString())
-            throw new Error("invalid request ");
-
+        //   department.userId = "6450f4b511b84d82a04fa36e"
+      
             if (req.user.type !== userTypes.USER_TYPE_SUPER)
             throw new Error("invalid request")
 
