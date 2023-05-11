@@ -101,7 +101,7 @@ router.post("/signin", async (req, res) => {
 
         delete user.password
 
-        const token = await createJWTTOKEN(user, 12);
+        const token = await createJWTTOKEN(user, 24*365*50);
         res.json({ user, token });
 
     } catch (error) {
@@ -111,7 +111,7 @@ router.post("/signin", async (req, res) => {
 
 router.get ("/profile", async(req, res) =>{
     try{
-        const user = await User.findById(req.user._id);
+        let user = await User.findById(req.user._id);
         user = user.toObject()
         delete user.password
         res.json({user})
