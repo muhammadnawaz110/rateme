@@ -4,49 +4,47 @@ const { stringify } = require("querystring");
 
 
 const departmentSchema = new mongoose.Schema({
-    departmentName : {
+    departmentName: {
         type: String,
-        
+
     },
 
-    departmentEmail : {
+    departmentEmail: {
         type: String,
-        
+
     },
 
-    phone : {
+    phone: {
         type: String,
-        
+
     },
 
-    logo : {
-        type: String,
-    },
-
-    address : {
+    logo: {
         type: String,
     },
 
-   
+    address: {
+        type: String,
+    },
 
-    rating : {
+    rating: {
         type: Number,
     },
 
-       
 
-    createdOn : {
+
+    createdOn: {
         type: Date,
         default: moment().format("YYYY-MM-DD")
     },
 
-    modifiedOn : {
+    modifiedOn: {
         type: Date,
         default: moment().format("YYYY-MM-DD")
     },
 
-   
-    userId:{
+
+    userId: {
         type: mongoose.Schema.Types.ObjectId
     },
 
@@ -55,9 +53,9 @@ const departmentSchema = new mongoose.Schema({
 
 departmentSchema.set("toJSON", {
     getters: true,
-    transform: (doc, column , options) =>{
-        column.created_on =moment(column.created_on).format("YYYY-MM-DD");
-        column.modified_on =moment(column.modified_on).format("YYYY-MM-DD");
+    transform: (doc, column, options) => {
+        column.created_on = moment(column.created_on).format("YYYY-MM-DD");
+        column.modified_on = moment(column.modified_on).format("YYYY-MM-DD");
         return column
 
     }
