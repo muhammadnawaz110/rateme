@@ -1,20 +1,25 @@
 import { Button } from "@mui/material";
 import { connect, useDispatch } from "react-redux";
-import { showProgressBar, hideProgressBar } from "./store/actions/progressBarActons";
 import ProgressBar from "./components/library/ProgressBar";
 import AppPublic from "./AppPublic";
 import { loadAuth, signout } from "./store/actions/authActions";
 import {useEffect} from "react"
 import AppPreLoader from "./components/library/AppPreloader";
+import {Navigate, useLocation} from "react-router-dom";
 
-
+const publicRoutes = ["/", "/admin/signin", "/admin/forgot-password", "/admin/reset-password/:resetCode"]
 function App({ user, isAuthLoaded, loadAuth, signout}) {
+  const location = useLocation();
   useEffect(() =>{
      loadAuth()
-
   }, []);
 
   if(!isAuthLoaded) return <AppPreLoader message={"Loading App"}/>
+
+  if(user && publicRoutes.includes(location.pathname))
+    return <Navigate to ="/admin/dasboard"/>
+  if(!user && !publicRoutes.includes(location.pathname))
+    return <Navigate to="/admin/signin"/>
 
   if( !user)
     return <AppPublic />
