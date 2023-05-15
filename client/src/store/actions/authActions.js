@@ -1,4 +1,5 @@
 import axios from "axios"
+import { showError } from "./alertActions";
 
 export const authActions = {
     SIGN_IN: 'signin',
@@ -31,8 +32,9 @@ export const loadAuth = () => {
                 type: authActions.AUTH_LOADED,
                 user: data.user
             })
-        }).catch(err => {
-            console.log(err)
+        }).catch(error => {
+            if (token)
+            diapatch(showError(error.message))
         });
     }
 }
