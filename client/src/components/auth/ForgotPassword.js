@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey } from '@fortawesome/free-solid-svg-icons';
 import TextInput from "../library/form/TextInput";
 import { Button, Box, CircularProgress } from "@mui/material";
+
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -11,6 +12,7 @@ import { showError, showSuccess } from "../../store/actions/alertActions";
 function ForgotPassword() {
     const dispatch = useDispatch();
     const navigator = useNavigate();
+
 
     const validate = (data) => {
         const errors = {};
@@ -21,6 +23,7 @@ function ForgotPassword() {
         return errors
     };
 
+
     const handelForgotPassword = async (data, form) => {
         try {
             let result = await axios.post("/users/forgot-password", data);
@@ -29,12 +32,14 @@ function ForgotPassword() {
                 navigator("/admin/signin");
                 dispatch( showSuccess('An email has been sent successfuly to your inbox, plse check to reset'))
             }            // dispatch(signin(user, token));
+
         } catch (error) {
             let message = error && error.response && error.response.data ? error.response.data.error : error.message;
             dispatch(showError(message))
         }
 
     };
+
 
     return (
         <Box bgcolor={'#fff'} p={3} textAlign={'center'} minWidth={'350px'} borderRadius="5px" boxShadow="0 0 17px 5px #dbdada">

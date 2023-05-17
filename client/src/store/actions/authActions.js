@@ -20,21 +20,23 @@ export const signout = () => {
 
 
 export const loadAuth = () => {
-    return (diapatch, getState) => {
+    return (dispatch, getState) => {
         
         const token = localStorage.getItem('token');
-        diapatch({
+        dispatch({
                 type: authActions.LOAD_TOKEN,
                 token: token ? token : null
             })
         axios.get('/users/profile').then((data) =>{
-            dispatchEvent({
+            dispatch({
                 type: authActions.AUTH_LOADED,
                 user: data.user
             })
         }).catch(error => {
+
             if (token)
             diapatch(showError(error.message))
+
         });
     }
 }
