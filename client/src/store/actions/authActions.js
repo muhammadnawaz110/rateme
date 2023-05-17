@@ -33,8 +33,10 @@ export const loadAuth = () => {
                 user: data.user
             })
         }).catch(error => {
-            if(token)
-            dispatch(showError(error.message))
+
+            if (token)
+            diapatch(showError(error.message))
+
         });
     }
 }

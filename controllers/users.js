@@ -5,8 +5,10 @@ const User = require("../models/User");
 const { createJWTTOKEN } = require("../utils/util");
 const router = express.Router()
 const { verifyUser } = require("../middlewares/auth");
-const { randomBytes } = require('crypto');
+
 const { default: axios } = require("axios");
+const ejs = require('ejs');
+const { randomBytes } = require('crypto');
 
 
 router.use(["/add", "/edit", "/delete", "/profile", "/profile-update"], verifyUser);
@@ -150,41 +152,87 @@ router.post("/profile-update", async (req, res) => {
 
 router.post("/forgot-password", async (req, res) => {
     try {
-        if (!req.body.email) throw new Error("Email is required");
-        const user = await User.findOne({ email: req.body.email })
-        console.log(req.body)
-        if (!user) throw new Error("Email or password is incorrect")
-
-        const code = user._id.toString() + randomBytes(Math.ceil(25 / 2)).toString('hex').slice(0, 25);
-        await User.findByIdAndUpdate(user._id, { passwordResetCode: code })
-
-        const data = {
-            Recipients: {
-                To: [user.email]
-            },
-            Content: {
-                Body: [{
-                    ContentType: 'HTML',
-                    Content: 'testing email service',
-                    Charset: "utf8"
-                }],
-                from: process.env.EMAIL_FROM
-            }
+      if (!req.body.email) throw new Error("Email is required");
+      let user = await User.findOne({ email: req.body.email });
+      if (!user) throw new Error("Invalid request");
+  
+      const passwordResetCode = user._id.toString() + randomBytes(Math.ceil(25/2)).toString('hex').slice(0, 25);
+      await User.findByIdAndUpdate(user._id, { passwordResetCode });
+  
+      const resetPasswordURL = process.env.BASE_URL + 'admin/reset-password/' + passwordResetCode;
+  
+      const data = {
+        Recipients: {
+          To: [user.email]
+        },
+        Content: {
+          Body: [{
+            ContentType: 'HTML',
+            Content: await ejs.renderFile('./emails/resetPassword.ejs', { name: user.name, resetPasswordURL }),
+            Charset: "utf8"
+          }],
+          subject: 'Reset Password',
+          from: process.env.EMAIL_FROM
         }
+      }
+  
+    //   const response = await axios.post('https://api.elasticemail.com/v4/emails/transactional', data, {
+    //     headers: { 'X-ElasticEmail-ApiKey': process.env.EMAIL_API_KEY }
+    //   })
+  
+      
+      res.json({success : true });
 
-        const response = await axios.post('https://api.elasticemail.com/v4/emails/transactional', data, {
-            headers: {
-                'X-ElasticEmail-ApiKey': process.env.EMAIL_API_KEY
-            }
-        })
-        console.log(response)
-
-        res.json({ user });
+  
     } catch (error) {
-        console.log(error)
-        res.status(400).json({ error: error.message })
+      console.log(error)
+      res.status(400).json({ error: error.message });
     }
-})
+  });
 
+  router.post("/verify-reset-code", async (req, res) => {
+
+    try {
+      if (!req.body.code) throw new Error("Code is required");
+      let user = await User.findOne({ passwordResetCode: req.body.code });
+      if (!user) throw new Error("Invalid request");
+  
+      user = user.toObject(); 
+      delete user.password;
+      
+      res.json({ user });
+  
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  router.post("/reset-password", async (req, res) => {
+
+    try {
+      if (!req.body.code) throw new Error("Code is required");
+      if (!req.body.newPassword) throw new Error("New password is required");
+      if (!req.body.confirmPassword) throw new Error("Confirm password is required");
+  
+      if(req.body.newPassword.length < 6)  
+        throw new Error("Password should have at least 6 characters");
+  
+      if(req.body.newPassword !== req.body.confirmPassword)
+        throw new Error("Passwords are not same");
+  
+      let user = await User.findOne({ passwordResetCode: req.body.code });
+      if (!user) throw new Error("Invalid request");
+  
+      await User.findByIdAndUpdate(user._id, {
+        password: await bcrypt.hash(req.body.newPassword, 10),
+        passwordResetCode: ''
+      })
+      
+      res.json({ success: true });
+  
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
 
 module.exports = router
