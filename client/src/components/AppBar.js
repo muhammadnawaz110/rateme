@@ -22,13 +22,13 @@ export default function AppBar() {
   return (
     <div>
       <MuiAppBar>
-        <Container maxWidth="x1">
+        <Container maxWidth="lg">
             <Toolbar>
                 <AdbIcon sx={{display:{ md: 'flex'}, mr:1}} />
                 <Typography 
                     variant="h6"
                     component={Link}
-                    to="/admin/dasboard"
+                    to="/admin/dashboard"
                     sx={{
                         mr: 2,
                         display: {  md: 'flex' },
@@ -62,7 +62,7 @@ export default function AppBar() {
                     }}
                     open={Boolean(anchorE1)}
                     onClose={closeMenu}>
-                        <MenuItem component={Link} to="/admin/account-setting" onClick={closeMenu}>
+                        <MenuItem component={Link} to="/admin/account-settings" onClick={closeMenu}>
                             <Typography textAlign='center'>Account Setting</Typography>
                         </MenuItem>
                         <MenuItem  onClick={logout}>

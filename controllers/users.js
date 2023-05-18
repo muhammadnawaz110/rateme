@@ -126,25 +126,43 @@ router.get("/profile", async (req, res) => {
 });
 
 router.post("/profile-update", async (req, res) => {
-    const userExist = await User.findOne({ email: req.body.email, _id: { $ne: req.user._id } });
 
     try {
-        if (userExist) throw new Error("This email is already registered")
+        if (!req.body.name) throw new Error("name is  registered");
 
-        const { name, email, phoneNumber, profilePicture, password, type, createdOn, modifiedOn } = req.body
-        let updatedUser = await User.findByIdAndUpdate(req.user._id, {
-            name: name,
-            email: email,
-            phoneNumber,
-            profilePicture,
-            password: await bcrypt.hash(password, 10),
-            type,
-            createdOn: createdOn,
-            modifiedOn: modifiedOn
-        })
-        updatedUser = updatedUser.toObject()
-        delete updatedUser.password
-        res.json({ user: updatedUser })
+        const record = {
+          name: req.body.name,
+          phoneNumber: req.body.phoneNumber,
+          modifiedOn: new Date()
+        }
+        if(req.body.newPassword)
+        {
+          if(!req.body.currentPassword) throw new Error('Current password is required');
+          if(!(await bcrypt.compare(req.body.currentPassword, req.user.password)))
+            throw new Error('Current password is in currect');
+          if(req.body.newPassword.length < 6) throw new Error('new password should have at least 6 charecters');
+          if(req.body.newPassword !== req.body.confirmPassword) throw new Error('password are not same');
+          record.password = await bcrypt.hash(req.body.newPassword, 10)
+        }
+
+        await User.findByIdAndUpdate(req.user._id, record);
+        let user = await User.findById(req.user._id);
+        user = user.toObject();
+        delete user.password;
+        res.json({ user });
+
+
+
+        // let updatedUser = await User.findByIdAndUpdate(req.user._id, {
+        //     name: name,
+        //     email: email,
+        //     phoneNumber,
+        //     password: await bcrypt.hash(password, 10),
+        //     modifiedOn: modifiedOn
+        // })
+        // updatedUser = updatedUser.toObject()
+        // delete updatedUser.password
+        // res.json({ user: updatedUser })
     } catch (error) {
         res.status(400).json({ error: error.message })
     }

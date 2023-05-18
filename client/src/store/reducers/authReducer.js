@@ -22,6 +22,7 @@ const authReducer = (state = initState, action) => {
                 token: action.token
             }
         case authActions.AUTH_LOADED:
+            console.log(action);
             return{
                 ...state,
                 user: action.user,

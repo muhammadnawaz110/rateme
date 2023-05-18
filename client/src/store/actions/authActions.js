@@ -27,7 +27,7 @@ export const loadAuth = () => {
                 type: authActions.LOAD_TOKEN,
                 token: token ? token : null
             })
-        axios.get('/users/profile').then((data) =>{
+        axios.get('/users/profile').then(({data}) =>{
             dispatch({
                 type: authActions.AUTH_LOADED,
                 user: data.user
