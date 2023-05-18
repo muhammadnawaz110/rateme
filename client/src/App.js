@@ -6,6 +6,7 @@ import { loadAuth, signout } from "./store/actions/authActions";
 import {useEffect} from "react"
 import AppPreLoader from "./components/library/AppPreloader";
 import {Navigate, useLocation} from "react-router-dom";
+import AppBar from "./components/AppBar";
 
 const publicRoutes = [ "/admin/signin", "/admin/forgot-password", "/admin/reset-password/"]
 
@@ -32,6 +33,7 @@ function App({ user, isAuthLoaded, loadAuth, signout}) {
     <div className="App">
       your are signed in
       <Button onClick={signout}>Logout</Button>
+      <AppBar/>
 
    <ProgressBar/>
     </div>

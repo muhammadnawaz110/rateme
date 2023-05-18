@@ -35,7 +35,7 @@ export const loadAuth = () => {
         }).catch(error => {
 
             if (token)
-            diapatch(showError(error.message))
+            dispatch(showError(error.message))
 
         });
     }
