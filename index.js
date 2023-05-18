@@ -16,7 +16,7 @@ app.use("/api/users", usersRoutes)
 app.use("/api/employees", employeesRoutes)
 
 
-mongoose.connect(process.env.MONGODB_CONNECTION_URL).then(() => {
+mongoose.connect(process.env.MONGODB_CONNECTION_URI).then(() => {
     console.log("database connected successfully")
 }).catch(error => {
     console.log(error)
