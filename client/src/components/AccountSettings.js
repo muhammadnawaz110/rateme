@@ -6,17 +6,19 @@ import { connect, useDispatch } from "react-redux";
 import { showError, showSuccess } from "../store/actions/alertActions";
 import TextInput from "./library/form/TextInput";
 import { hideProgressBar, showProgressBar } from "../store/actions/progressBarActons";
+import FileInput from "./library/form/FileInput";
 
 function AccountSettings({ user }) {
 
     const dispatch = useDispatch();
     return (
-        <Box p={3} bgcolor={"#fff"} textAlign="center" borderRadius="5px" minWidth="350px" boxShadow="0px 0px 17px 5px #dbdada">
+        <Box  textAlign="center" sx={{ width:{ sm: '100%', md:'50%'}, mx: 'auto'}}>
             <h3>Account Settings</h3>
             <Form
                 onSubmit={(data) => {
-                    dispatch(showProgressBar())
-                    return axios.post('/users/profile-update', data).
+                    dispatch(showProgressBar() );
+                    
+                    return axios.postForm('/users/profile-update', data).
                         then(({ data }) => {
                             if (data.user) {
                                 dispatch(showSuccess('Account Setting update successfully'));
@@ -61,6 +63,7 @@ function AccountSettings({ user }) {
                                 <Field name="name" type="text" component={TextInput} placeholder="Enter email addres..." disable />
                                 <Field name="email" type="email" component={TextInput} placeholder="Enter email addres..." disable />
                                 <Field name="phoneNumber" type="phonenumber" component={TextInput} placeholder="Enter phone number..." />
+                                <Field name="profilePicture"  component={FileInput} inputProps={{accept:'image/*'}}/>
                                 <Field name="currentPassword" type="password" component={TextInput} placeholder="Current Password..." />
                                 <Field name="newPassword" type="password" component={TextInput} placeholder=" New Password..." />
                                 <Field name="confirmPassword" type="password" component={TextInput} placeholder="Confirm Password..." />
