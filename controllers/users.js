@@ -5,10 +5,12 @@ const User = require("../models/User");
 const { createJWTTOKEN } = require("../utils/util");
 const router = express.Router()
 const { verifyUser } = require("../middlewares/auth");
-
 const { default: axios } = require("axios");
 const ejs = require('ejs');
 const { randomBytes } = require('crypto');
+const multer = require('multer');
+const fs = require('fs').promises;
+
 
 
 router.use(["/add", "/edit", "/delete", "/profile", "/profile-update"], verifyUser);
@@ -94,6 +96,22 @@ router.get("/", async (req, res) => {
     }
 })
 
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    try{
+      await fs.mkdir(`content/${req.user._id}/`, { recursive: true});
+      cb(null, `content/${req.user._id}/`);
+    }catch(err)
+    {
+      cb(err, null);
+    }
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+})
+const upload = multer({ storage});
+
 router.post("/signin", async (req, res) => {
     try {
         if (!req.body.email) throw new Error("Email is required");
@@ -125,7 +143,7 @@ router.get("/profile", async (req, res) => {
     }
 });
 
-router.post("/profile-update", async (req, res) => {
+router.post("/profile-update", upload.single('profilePicture'),async (req, res) => {
 
     try {
         if (!req.body.name) throw new Error("name is  registered");
@@ -135,6 +153,8 @@ router.post("/profile-update", async (req, res) => {
           phoneNumber: req.body.phoneNumber,
           modifiedOn: new Date()
         }
+        if(req.file && req.file.fieldname)
+        record.profilePicture = req.file.filename;
         if(req.body.newPassword)
         {
           if(!req.body.currentPassword) throw new Error('Current password is required');
