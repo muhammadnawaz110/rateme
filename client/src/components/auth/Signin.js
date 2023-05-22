@@ -14,7 +14,7 @@ function Signin() {
             <h3>Rate Me</h3>
             <Form
                 onSubmit={(data) => {
-                    return axios.post('/users/signin', data).then(({data}) => {
+                    return axios.post('api/users/signin', data).then(({data}) => {
                         dispatch( signin(data.user, data.token) )
                         localStorage.setItem('token', data.token)
                     }).catch(err => {

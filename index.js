@@ -11,6 +11,7 @@ const employeesRoutes = require("./controllers/employees");
 const app = express();
 app.use(express.json())
 app.use(cors())
+app.use('/content', express.static('content/'));
 app.use("/api/departments", departmentsRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/employees", employeesRoutes)
@@ -28,6 +29,13 @@ app.get('/test', (req, res) =>{
 
 app.all('*', (req, res) =>{
     res.send('page Not Found')
+});
+app.use((err, req, res, next ) => {
+    if(err){
+        res.status(400).json({ error: err.message });
+    }else{
+        next()
+    }
 })
 
 app.listen(5000, function() {

@@ -7,6 +7,7 @@ import { showError, showSuccess } from "../store/actions/alertActions";
 import TextInput from "./library/form/TextInput";
 import { hideProgressBar, showProgressBar } from "../store/actions/progressBarActons";
 import FileInput from "./library/form/FileInput";
+import { updateUser } from "../store/actions/authActions";
 
 function AccountSettings({ user }) {
 
@@ -18,9 +19,10 @@ function AccountSettings({ user }) {
                 onSubmit={(data) => {
                     dispatch(showProgressBar() );
                     
-                    return axios.postForm('/users/profile-update', data).
+                    return axios.postForm('api/users/profile-update', data).
                         then(({ data }) => {
                             if (data.user) {
+                                dispatch( updateUser(data.user))
                                 dispatch(showSuccess('Account Setting update successfully'));
                             }
                             dispatch(hideProgressBar());

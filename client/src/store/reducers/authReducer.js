@@ -39,6 +39,11 @@ const authReducer = (state = initState, action) => {
                 userType: null,
                 isLoaded: true
             }
+        case authActions.UPDASTE_USER:
+            return{
+                ...state,
+                user: action.user
+            }
         default:
             return state;
     }
