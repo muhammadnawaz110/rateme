@@ -3,11 +3,12 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { signout } from "../store/actions/authActions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ProgressBar from "./library/ProgressBar";
 
 export default function AppBar() {
     const dispatch = useDispatch();
+    const user = useSelector(state => state.auth.user)
     const [anchorE1, setAnchorE1] = useState(null);
     const openMenu = (event) => {
         setAnchorE1(event.currentTarget);
@@ -51,7 +52,8 @@ export default function AppBar() {
                 <Box>
                     <Tooltip title="Open Setting">
                         <IconButton onClick={openMenu}>
-                            <Avatar alt="Profile Picture" src=""/>
+
+                            <Avatar alt="Profile Picture" src={ process.env.REACT_APP_BASE_URL + `content/${user._id}/${user.profilePicture}`}/>
                         </IconButton>
                     </Tooltip>
                     <Menu

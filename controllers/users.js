@@ -10,6 +10,7 @@ const ejs = require('ejs');
 const { randomBytes } = require('crypto');
 const multer = require('multer');
 const fs = require('fs').promises;
+const path = require ('path');
 
 
 
@@ -110,7 +111,18 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   }
 })
-const upload = multer({ storage});
+const upload = multer({
+  storage,
+   fileFilter: (req, file, cb) => {
+    const allowedTypes = ['jpg', 'gif', 'png', 'bmp', 'jpeg']
+    const ext = path.extname(file.originalname).replace('.', '')
+    if(allowedTypes.includes(ext)){
+      cb(null, true)
+    }else{
+      cb((new Error('file is not allowed')), false) 
+    }
+   }
+});
 
 router.post("/signin", async (req, res) => {
     try {
@@ -153,8 +165,15 @@ router.post("/profile-update", upload.single('profilePicture'),async (req, res) 
           phoneNumber: req.body.phoneNumber,
           modifiedOn: new Date()
         }
-        if(req.file && req.file.fieldname)
-        record.profilePicture = req.file.filename;
+        if(req.file && req.file.fieldname){
+          record.profilePicture = req.file.filename;
+          if(req.user.profilePicture && req.user.profilePicture !== req.file.filename)
+          {
+            const oldPicPath = `content/${req.user._id}/${req.user.profilePicture}`;
+            await fs.unlink(oldPicPath);
+          }
+
+        }
         if(req.body.newPassword)
         {
           if(!req.body.currentPassword) throw new Error('Current password is required');
