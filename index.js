@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const usersRoutes = require("./controllers/users");
-const departmentsRoutes = require("./controllers/department");
+const departmentsRoutes = require("./controllers/departments");
 const employeesRoutes = require("./controllers/employees");
 
 
