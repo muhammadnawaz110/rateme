@@ -2,7 +2,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const { createJWTTOKEN } = require("../utils/util");
+const { createJWTTOKEN, userTypes } = require("../utils/util");
 const router = express.Router()
 const { verifyUser } = require("../middlewares/auth");
 const { default: axios } = require("axios");
@@ -14,7 +14,7 @@ const path = require ('path');
 
 
 
-router.use(["/add", "/edit", "/delete", "/profile", "/profile-update"], verifyUser);
+router.use([ "/","/add", "/edit", "/delete", "/profile", "/profile-update"], verifyUser);
 
 router.post("/add", async (req, res) => {
     const userExist = await User.findOne({ email: req.body.email, _id: { $ne: req.body.id } });
@@ -71,7 +71,7 @@ router.post("/edit", async (req, res) => {
 });
 
 router.delete("/delete", async (req, res) => {
-    console.log(req.body.id)
+    // console.log(req.body.id)
     try {
         if (!req.body.id) throw new Error("User id is required")
         if (!mongoose.isValidObjectId(req.body.id)) throw new Error("user id is invalid")

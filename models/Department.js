@@ -4,7 +4,7 @@ const { stringify } = require("querystring");
 
 
 const departmentSchema = new mongoose.Schema({
-    departmentName: {
+    name: {
         type: String,
 
     },
@@ -41,11 +41,6 @@ const departmentSchema = new mongoose.Schema({
     modifiedOn: {
         type: Date,
         default: moment().format("YYYY-MM-DD")
-    },
-
-
-    userId: {
-        type: mongoose.Schema.Types.ObjectId
     },
 
 });

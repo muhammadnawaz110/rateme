@@ -11,6 +11,10 @@ import AccountSettings from "./components/AccountSettings";
 import Dashboard from "./components/DashBoard";
 import Alert from "./components/library/Alert";
 import BlockInterface from "./components/library/BlockInterface.js";
+import AddDepartment from "./components/departments/AddDepartment";
+import EditDepartment from "./components/departments/EditDepartment";
+import Department from "./components/departments/Departments";
+import Departments from "./components/departments/Departments";
 
 const publicRoutes = [ "/admin/signin", "/admin/forgot-password", "/admin/reset-password/"]
 
@@ -44,6 +48,10 @@ function App({ user, isAuthLoaded, loadAuth, signout}) {
         <Routes>
           <Route path="/admin/account-settings" Component={AccountSettings} />
           <Route path="/admin/dashboard" Component={Dashboard} />
+          <Route path="/admin/departments" Component={Departments} />
+          <Route path="/admin/departments/add" Component={AddDepartment} />
+          <Route path="/admin/departments/edit/:deptId" Component={EditDepartment} />
+
         </Routes>
       </Container>
     </div>
