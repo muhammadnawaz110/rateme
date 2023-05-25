@@ -9,10 +9,12 @@ import { hideProgressBar, showProgressBar } from "../../store/actions/progressBa
 import FileInput from "../library/form/FileInput";
 import { showError, showSuccess } from "../../store/actions/alertActions";
 import { addDepartment } from "../../store/actions/departmentActions";
+import { useNavigate } from "react-router-dom";
 
 
 function AddDepartment() {
   const dispatch = useDispatch()
+  const navigator = useNavigate()
 
 
 
@@ -35,6 +37,7 @@ function AddDepartment() {
       if (result.data.department) {
         dispatch(addDepartment(result.data.department));
         dispatch(showSuccess('Department added successfully'))
+        navigator("/admin/departments")
       }
       dispatch(hideProgressBar())
 

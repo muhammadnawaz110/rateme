@@ -14,7 +14,7 @@ const path = require ('path');
 
 
 
-router.use([ "/","/add", "/edit", "/delete", "/profile", "/profile-update"], verifyUser);
+router.use([ "/add", "/edit", "/delete", "/profile", "/profile-update"], verifyUser);
 
 router.post("/add", async (req, res) => {
     const userExist = await User.findOne({ email: req.body.email, _id: { $ne: req.body.id } });

@@ -9,7 +9,7 @@ const departmentSchema = new mongoose.Schema({
 
     },
 
-    departmentEmail: {
+    email: {
         type: String,
 
     },
