@@ -6,16 +6,23 @@ import TextInput from "../library/form/TextInput";
 import { hideProgressBar, showProgressBar } from "../../store/actions/progressBarActons";
 import FileInput from "../library/form/FileInput";
 import { showError, showSuccess } from "../../store/actions/alertActions";
-import { addDepartment } from "../../store/actions/departmentActions";
-import { useParams } from "react-router-dom";
+import {  updateDepartment } from "../../store/actions/departmentActions";
+import { Navigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 
 function EditDepartment() {
   const dispatch = useDispatch()
+  const navigator = useNavigate()
+
 const { deptId } = useParams()
-console.log(deptId)
 const department = useSelector( state  => state.departments.records.find(item => item._id === deptId));
-console.log(department)
+if(!department)
+{
+  return <Navigate to='/admin/departments'/>
+}
+
 
 
   const validate = (data) => {
@@ -33,10 +40,11 @@ console.log(department)
   const handelDepartment = async (data, form) => {
     try {
       dispatch(showProgressBar())
-      let result = await axios.postForm("api/departments/add", data);
+      let result = await axios.postForm("api/departments/edit", { ...data,  id: deptId});
       if (result.data.department) {
-        dispatch(addDepartment(result.data.department));
+        dispatch(updateDepartment(result.data.department));
         dispatch(showSuccess('Department added successfully'))
+        navigator('/admin/departments');
       }
       dispatch(hideProgressBar())
 
@@ -50,11 +58,16 @@ console.log(department)
 
   return (
     <Box textAlign={'center'} sx={{ width: { sm: "50%", md: "50%" }, mx: "auto" }}>
-      <h3>Add Department</h3>
+      <h3>Update Department</h3>
       <Form
         onSubmit={handelDepartment}
         validate={validate}
-        initialValues={{}}
+        initialValues={{
+          name: department && department.name,
+          email: department && department.email,
+          phone: department && department.phone,
+          address: department && department.address,
+        }}
         render={({
           handleSubmit,
           submitting,
@@ -72,7 +85,7 @@ console.log(department)
               variant="outlined"
               type="submit"
               disabled={invalid || submitting}
-            >Add Department</Button>
+            >Update Department</Button>
           </form>
         )}
       />
