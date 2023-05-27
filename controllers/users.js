@@ -17,57 +17,74 @@ const path = require ('path');
 router.use([ "/add", "/edit", "/delete", "/profile", "/profile-update"], verifyUser);
 
 router.post("/add", async (req, res) => {
-    const userExist = await User.findOne({ email: req.body.email, _id: { $ne: req.body.id } });
-    try {
-        if (userExist) throw new Error("This email is already registered")
-        const { name, email, phoneNumber, profilePicture, password, type, createdOn, modifiedOn } = req.body
-        console.log(req.body)
-        const user = new User({
-            name: name,
-            email: email,
-            phoneNumber,
-            profilePicture,
-            password: await bcrypt.hash(password, 10),
-            type,
-            createdOn: createdOn,
-            modifiedOn: modifiedOn
-        })
-        await user.save();
-        res.json({ user })
-    } catch (error) {
-        res.status(400).json({ error: error.message })
+  try {
+    //only super admin can add user
+    if (req.user.type !== userTypes.USER_TYPE_SUPER)
+      throw new Error("Invalid Request");
+
+    const userExist = await User.findOne({ email: req.body.email });
+    if (userExist) throw new Error("This email is already registered");
+
+    const record = {
+      name: req.body.name,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      password: await bcrypt.hash(req.body.password, 10),
+      type: req.body.type,
+      departmentId: req.body.departmentId,
+      createdOn: new Date()
     }
-})
+
+    const user = new User(record)
+
+    await user.save();
+    res.json({ user });
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
 router.post("/edit", async (req, res) => {
-    const userExist = await User.findOne({ email: req.body.email });
-    try {
-        if (userExist) throw new Error("This email is already registered")
+  try {
 
-        if (!req.body.id) throw new Error("User id is required");
-        if (!mongoose.isValidObjectId(req.body.id))
-            throw new Error("user id is invalid");
-        if (req.user._id.toString() !== req.body.id)
-            throw new Error("invalid request s");
+    //only super admin can edit user
+    if (req.user.type !== userTypes.USER_TYPE_SUPER)
+    throw new Error("Invalid Request");
 
-        const user = await User.findById(req.body.id);
-        if (!user) throw new Error("user does not exists");
+    const userExist = await User.findOne({ email: req.body.email, _id: { $ne: req.body.id } });
+    if (userExist) throw new Error("This email is already registered");
 
-        const { name, email, phoneNumber, profilePicture, password, type, createdOn, modifiedOn } = req.body
-        let updatedUser = await User.findByIdAndUpdate(req.body.id, {
-            name: name,
-            email: email,
-            phoneNumber,
-            profilePicture,
-            password: await bcrypt.hash(password, 10),
-            type,
-            createdOn: createdOn,
-            modifiedOn: modifiedOn
-        })
-        res.json({ user: updatedUser })
-    } catch (error) {
-        res.status(400).json({ error: error.message })
+    if (!req.body.id) throw new Error("User id is required");
+    if (!mongoose.isValidObjectId(req.body.id))
+      throw new Error("User id is invalid");
+
+    const user = await User.findById(req.body.id);
+    if (!user) throw new Error("User does not exists");
+
+
+    const record = {
+      name: req.body.name,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      type: req.body.type,
+      departmentId: req.body.departmentId,
+      modifiedOn: new Date()
     }
+
+    if(req.body.password)
+      record.password = await bcrypt.hash(req.body.password, 10);
+
+    await User.findByIdAndUpdate(req.body.id, record)
+
+    let updatedUser = await User.findById(req.body.id);
+    delete updatedUser.password;
+
+    res.json({ user: updatedUser });
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 router.delete("/delete", async (req, res) => {

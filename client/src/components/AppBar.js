@@ -48,6 +48,13 @@ export default function AppBar() {
                     sx={{ color: '#fff', my:2 }}>
                         Departments
                     </Button>
+                    <Button 
+                    component={Link}
+                    to="/admin/users"
+                    sx={{ color: '#fff', my:2 }}>
+                        users
+                    </Button>
+                    
                 </Box>
                 <Box>
                     <Tooltip title="Open Setting">
