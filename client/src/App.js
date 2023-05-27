@@ -15,6 +15,9 @@ import AddDepartment from "./components/departments/AddDepartment";
 import EditDepartment from "./components/departments/EditDepartment";
 import Department from "./components/departments/Departments";
 import Departments from "./components/departments/Departments";
+import AddUser from "./components/user/AddUser";
+import User from "./components/user/User";
+import EditUser from "./components/user/EditUser";
 
 const publicRoutes = [ "/admin/signin", "/admin/forgot-password", "/admin/reset-password/"]
 
@@ -51,6 +54,9 @@ function App({ user, isAuthLoaded, loadAuth, signout}) {
           <Route path="/admin/departments" Component={Departments} />
           <Route path="/admin/departments/add" Component={AddDepartment} />
           <Route path="/admin/departments/edit/:deptId" Component={EditDepartment} />
+          <Route path="/admin/users" Component={User} />
+          <Route path="/admin/users/add" Component={AddUser} />
+          <Route path="/admin/users/edit/:userId" Component={EditUser} />
 
         </Routes>
       </Container>

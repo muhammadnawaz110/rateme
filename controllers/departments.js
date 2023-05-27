@@ -91,8 +91,11 @@ router.post("/edit", upload.single("logo"), async (req, res) => {
       address: req.body.address,
     };
 
-    if (req.file && req.file.filename) {
+    if (req.file && req.file.filename)
+     {
       record.logo = req.file.filename;
+      if(department.logo && department.logo !== req.fieldname);
+      await fs.unlink('content/departments/' + department.logo)
     }
 
      await Department.findByIdAndUpdate(req.body.id, record)
