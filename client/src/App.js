@@ -22,7 +22,7 @@ import { userTypes } from "./utils/constants";
 
 const publicRoutes = [ "/admin/signin", "/admin/forgot-password", "/admin/reset-password/"]
 
-function App({ user, isAuthLoaded, loadAuth, signout}) {
+function App({ user, isAuthLoaded, loadAuth, userType}) {
   const location = useLocation();
   useEffect(() =>{
      loadAuth()
@@ -53,7 +53,7 @@ function App({ user, isAuthLoaded, loadAuth, signout}) {
           <Route path="/admin/account-settings" Component={AccountSettings} />
           <Route path="/admin/dashboard" Component={Dashboard} />
           {
-            userTypes === userTypes.USER_TYPE_SUPER &&
+            userType === userTypes.USER_TYPE_SUPER &&
               <>
                 <Route path="/admin/departments" Component={Departments} />
                 <Route path="/admin/departments/add" Component={AddDepartment} />
@@ -73,7 +73,8 @@ function App({ user, isAuthLoaded, loadAuth, signout}) {
 const mapStateToProps = (state) => {
   return {
     user: state.auth.user,
-    isAuthLoaded: state.auth.isLoaded
+    isAuthLoaded: state.auth.isLoaded,
+    userType : state.auth.userType,
   }
 }
 

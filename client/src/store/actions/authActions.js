@@ -7,7 +7,7 @@ export const authActions = {
     AUTH_FAILED: 'authFailed',
     LOAD_TOKEN: 'loadToken',
     AUTH_LOADED: 'authloaded',
-    UPDASTE_USER: 'updateUser'
+    UPDASTE_USER: 'updateAuthUser'
 }
 
 export const updateUser = (user, token ) => ({ type: authActions.UPDASTE_USER, user})

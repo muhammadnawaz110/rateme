@@ -6,15 +6,29 @@ import { hideProgressBar, showProgressBar } from "../../store/actions/progressBa
 import FileInput from "../library/form/FileInput";
 import { showError, showSuccess } from "../../store/actions/alertActions";
 import { addUser } from "../../store/actions/userActions";
-import { useDispatch } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import SelectInput from "../library/form/SelectInput";
+import { loadDepartments } from "../../store/actions/departmentActions";
+import { useEffect, useMemo } from "react";
+import { userTypes } from "../../utils/constants";
 
 
-function AddUser() {
+function AddUser({departments, loadDepartments}) {
 
     const dispatch = useDispatch();
     const navigator = useNavigate();
+
+    useEffect(() => {
+        if (departments.length === 0)
+            loadDepartments()
+    }, []);
+
+    const deptOptions = useMemo(() => {
+        const options = [{ label: "Select Department", value: 0}];
+        departments.forEach(department => options.push({ label: department.name, value: department._id}));
+        return options;
+        }, [departments])
 
     const validate = (data) => {
         const errors = {};
@@ -27,12 +41,14 @@ function AddUser() {
         if (!data.phoneNumber) errors.phoneNumber = "Please enter phone number";
 
         if (!data.password)
-            errors.password = "Please enter current password";
+            errors.password = " password is required";
         else if (data.password.length < 6)
             errors.password = "Password should have at least 6 characters";
 
-        if (!data.type)
-            errors.type = "User type is required";
+        if(!data.type)
+            errors.type = "user type is required"
+        if (!data.type === userTypes.USER_TYPE_STANDARD && !data.department)
+            errors.type = "Department is required";
 
         return errors
     };
@@ -63,19 +79,29 @@ function AddUser() {
             <Form
                 onSubmit={handelUser}
                 validate={validate}
-                initialValues={{}}
+                initialValues={{
+                    type: 0,
+                    departmentId: 0
+
+                }}
                 render={({
                     handleSubmit,
                     submitting,
                     invalid,
                 }) => (
                     <form onSubmit={handleSubmit} method="post" encType="multipart/form-data">
-                        <Field component={TextInput} type='text' name="name" placeholder="Enter name" />
-                        <Field component={TextInput} type='email' name="email" placeholder="Enter email address" />
-                        <Field component={TextInput} type='text' name="phoneNumber" placeholder="Enter phone number" />
-                        <Field component={TextInput} type='password' name="password" placeholder="Enter current passowrd" />
-                        <Field component={SelectInput} name="type" options={[{ label: "Select user type", value: ' ' }, { label: "Super Admin", value: 1 }, { label: "Standard", value: 2 }]} />
+                        <Field component={TextInput} type='text' name="name" placeholder=" Name" autoFocus />
+                        <Field component={TextInput} type='email' name="email" placeholder=" Email address" />
+                        <Field component={TextInput} type='text' name="phoneNumber" placeholder=" Phone number" />
+                        <Field component={TextInput} type='password' name="password" placeholder=" Passowrd" />
+                        <Field size='small' component={SelectInput} name="type" options={[{ label: "Select user type", value: 0 }, { label: "Super Admin", value: userTypes.USER_TYPE_SUPER }, { label: "Standard", value: userTypes.USER_TYPE_STANDARD }]} />
+                        <Field
+                            component={SelectInput}
+                            name="departmentId"
 
+                            options={
+                                deptOptions
+                            } />
                         <Button
                             sx={{ marginTop: '20px' }}
                             variant="outlined"
@@ -89,4 +115,10 @@ function AddUser() {
     );
 }
 
-export default AddUser;
+const mapStateToProps = (state) => {
+    return {
+        departments:state.departments.records
+    }
+}
+
+export default connect(mapStateToProps, { loadDepartments })(AddUser);
