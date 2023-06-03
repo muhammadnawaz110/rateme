@@ -18,6 +18,7 @@ import Departments from "./components/departments/Departments";
 import AddUser from "./components/user/AddUser";
 import User from "./components/user/User";
 import EditUser from "./components/user/EditUser";
+import { userTypes } from "./utils/constants";
 
 const publicRoutes = [ "/admin/signin", "/admin/forgot-password", "/admin/reset-password/"]
 
@@ -51,8 +52,13 @@ function App({ user, isAuthLoaded, loadAuth, signout}) {
         <Routes>
           <Route path="/admin/account-settings" Component={AccountSettings} />
           <Route path="/admin/dashboard" Component={Dashboard} />
-          <Route path="/admin/departments" Component={Departments} />
-          <Route path="/admin/departments/add" Component={AddDepartment} />
+          {
+            userTypes === userTypes.USER_TYPE_SUPER &&
+              <>
+                <Route path="/admin/departments" Component={Departments} />
+                <Route path="/admin/departments/add" Component={AddDepartment} />
+              </>
+          }
           <Route path="/admin/departments/edit/:deptId" Component={EditDepartment} />
           <Route path="/admin/users" Component={User} />
           <Route path="/admin/users/add" Component={AddUser} />
