@@ -1,5 +1,5 @@
 import axios from "axios";
-import { showError } from "./alertActions";
+import { showError, showSuccess } from "./alertActions";
 import { hideProgressBar, showProgressBar } from "./progressBarActons";
 
 export const departmentActions = {
@@ -21,6 +21,24 @@ export const loadDepartments = () => {
     axios.get('api/departments').then(result => {
       dispatch({ type: departmentActions.DEPTS_LOADED, departments: result.data.departments })
       dispatch(hideProgressBar())
+
+    }).catch(error => {
+      dispatch(hideProgressBar())
+      let message = error && error.response && error.response.data ? error.response.data.error : error.message;
+      dispatch(showError(message))
+    })
+  }
+}
+export const deleteDepartment = (id) => {
+  return (dispatch, getState) => {
+
+    dispatch(showProgressBar())
+    axios.post('api/departments/delete', { id }).then(({ data }) => {
+      if (data.success) {
+        dispatch({ type: departmentActions.REMOVE_DEPT, id })
+        dispatch(hideProgressBar())
+        dispatch(showSuccess('Department deleted successfully'))
+      }
     }).catch(error => {
       dispatch(hideProgressBar())
       let message = error && error.response && error.response.data ? error.response.data.error : error.message;

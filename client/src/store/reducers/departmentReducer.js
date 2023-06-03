@@ -20,12 +20,17 @@ function departmentReducer(state = initialState, action) {
            return action.department;
         })
       }
-    case departmentActions.REMOVE_DEPT:
+      case departmentActions.REMOVE_DEPT:
+        return {
+          ...state,
+          records: state.records.filter(item => item._id !== action.id )
+        }
     case departmentActions.DEPTS_LOADED:
       return {
         ...state,
         records: action.departments
       }
+
 
     default:
       return state;

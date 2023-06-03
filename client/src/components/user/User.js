@@ -9,8 +9,8 @@ import EditIcon from '@mui/icons-material/Edit';
 
 function Users({ users, loadUsers }) {
   useEffect(() => {
-    if(users.length === 0)
-    loadUsers()
+    if (users.length === 0)
+      loadUsers()
   }, []);
   return (
     <Box>
@@ -37,21 +37,21 @@ function Users({ users, loadUsers }) {
         <TableBody>
           {
             users.map(user => (
-                <TableRow key={user._id}>
-                <TableCell>{ user.name }</TableCell>
-                <TableCell>{ user.phoneNumber }</TableCell>
-                <TableCell>{ user.email }</TableCell>
+              <TableRow key={user._id}>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.phoneNumber}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>
-                {
-                      user.type == 1 ?
-                        <Chip size='small' label="Super Admin" color="secondary" /> :
-                        <Chip size='small' label="Standard" color="primary" />
-                }
+                  {
+                    user.type == 1 ?
+                      <Chip size='small' label="Super Admin" color="secondary" /> :
+                      <Chip size='small' label="Standard" color="primary" />
+                  }
                 </TableCell>
                 <TableCell>
-                <IconButton component={Link} to={`/admin/users/edit/${user._id}`}><EditIcon /></IconButton>
+                  <IconButton component={Link} to={`/admin/users/edit/${user._id}`}><EditIcon /></IconButton>
                 </TableCell>
-                </TableRow>
+              </TableRow>
             ))
           }
         </TableBody>

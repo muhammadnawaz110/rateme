@@ -6,11 +6,12 @@ import { connect } from 'react-redux';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteDepartment from './DeleteDepartment';
 
 function Departments({ departments, loadDepartments }) {
   useEffect(() => {
-    if(departments.length === 0)
-    loadDepartments()
+    if (departments.length === 0)
+      loadDepartments()
   }, []);
   return (
     <Box>
@@ -37,19 +38,21 @@ function Departments({ departments, loadDepartments }) {
         <TableBody>
           {
             departments.map(dept => (
-                <TableRow key={dept._id}>
+              <TableRow key={dept._id}>
                 <TableCell>
                   {
                     dept.logo && < Avatar alt={dept.name} src={process.env.REACT_APP_BASE_URL + `content/departments/${dept.logo}`} />
                   }
                 </TableCell>
-                <TableCell>{ dept.name }</TableCell>
-                <TableCell>{ dept.phone }</TableCell>
-                <TableCell>{ dept.email }</TableCell>
+                <TableCell>{dept.name}</TableCell>
+                <TableCell>{dept.phone}</TableCell>
+                <TableCell>{dept.email}</TableCell>
                 <TableCell>
-                <IconButton component={Link} to={`/admin/departments/edit/${dept._id}`}><EditIcon /></IconButton>
+                  <IconButton component={Link} to={`/admin/departments/edit/${dept._id}`}><EditIcon /></IconButton>
+                  <DeleteDepartment departmentId={dept._id} name={dept.name} />
+
                 </TableCell>
-                </TableRow>
+              </TableRow>
             ))
           }
         </TableBody>
