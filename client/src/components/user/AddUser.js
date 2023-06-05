@@ -14,13 +14,13 @@ import { useEffect, useMemo } from "react";
 import { userTypes } from "../../utils/constants";
 
 
-function AddUser({departments, loadDepartments}) {
-
+function AddUser({departments, loadDepartments, loggedInUserType}) {
+console.log(loggedInUserType)
     const dispatch = useDispatch();
     const navigator = useNavigate();
 
     useEffect(() => {
-        if (departments.length === 0)
+        if ( loggedInUserType === userTypes.USER_TYPE_SUPER && departments.length === 0)
             loadDepartments()
     }, []);
 
@@ -45,10 +45,13 @@ function AddUser({departments, loadDepartments}) {
         else if (data.password.length < 6)
             errors.password = "Password should have at least 6 characters";
 
-        if(!data.type)
-            errors.type = "user type is required"
-        if (!data.type === userTypes.USER_TYPE_STANDARD && !data.department)
-            errors.type = "Department is required";
+        if(loggedInUserType === userTypes.USER_TYPE_SUPER ){
+
+            if(!data.type)
+                errors.type = "user type is required"
+            if (!data.type === userTypes.USER_TYPE_STANDARD && !data.department)
+                errors.type = "Department is required";
+        }
 
         return errors
     };
@@ -94,14 +97,13 @@ function AddUser({departments, loadDepartments}) {
                         <Field component={TextInput} type='email' name="email" placeholder=" Email address" />
                         <Field component={TextInput} type='text' name="phoneNumber" placeholder=" Phone number" />
                         <Field component={TextInput} type='password' name="password" placeholder=" Passowrd" />
-                        <Field size='small' component={SelectInput} name="type" options={[{ label: "Select user type", value: 0 }, { label: "Super Admin", value: userTypes.USER_TYPE_SUPER }, { label: "Standard", value: userTypes.USER_TYPE_STANDARD }]} />
-                        <Field
-                            component={SelectInput}
-                            name="departmentId"
-
-                            options={
-                                deptOptions
-                            } />
+                        {
+                            loggedInUserType === userTypes.USER_TYPE_SUPER &&
+                            <>
+                            <Field size='small' component={SelectInput} name="type" options={[{ label: "Select user type", value: 0 }, { label: "Super Admin", value: userTypes.USER_TYPE_SUPER }, { label: "Standard", value: userTypes.USER_TYPE_STANDARD }]} />
+                            <Field component={SelectInput} name="departmentId" options={deptOptions} />
+                            </>
+                        }      
                         <Button
                             sx={{ marginTop: '20px' }}
                             variant="outlined"
@@ -117,7 +119,8 @@ function AddUser({departments, loadDepartments}) {
 
 const mapStateToProps = (state) => {
     return {
-        departments:state.departments.records
+        departments:state.departments.records,
+        loggedInUserType: state.auth.user.type
     }
 }
 

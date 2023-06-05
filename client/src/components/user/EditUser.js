@@ -35,9 +35,7 @@ function EditUser({ departments, loadDepartments }) {
 
         if (!data.phoneNumber) errors.phoneNumber = "Please enter phone number";
 
-        
-        if (!data.password)
-            errors.password = " password is required";
+    
         if (data.password)
         {
             if (data.password.length < 6)

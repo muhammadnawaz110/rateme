@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteUser from './DeleteUser';
 
 function Users({ users, loadUsers }) {
   useEffect(() => {
@@ -50,6 +51,7 @@ function Users({ users, loadUsers }) {
                 </TableCell>
                 <TableCell>
                   <IconButton component={Link} to={`/admin/users/edit/${user._id}`}><EditIcon /></IconButton>
+                  <DeleteUser userId={user._id} name={user.name}/>
                 </TableCell>
               </TableRow>
             ))
