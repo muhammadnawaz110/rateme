@@ -161,9 +161,9 @@ router.post("/signin", async (req, res) => {
         if (!req.body.password) throw new Error("password is required")
         const user = await User.findOne({ email: req.body.email })
         
-        if (!user) throw new Error("Email or password is incorrect")
-        if (!(await bcrypt.compare(req.body.password, user.password)))
-            throw new Error('Email or password is incorrect')
+        // if (!user) throw new Error("Email or password is incorrect")
+        // if (!(await bcrypt.compare(req.body.password, user.password)))
+        //     throw new Error('Email or password is incorrect')
 
         delete user.password
 
