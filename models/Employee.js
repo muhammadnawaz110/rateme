@@ -11,11 +11,11 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required:true,
     },
-    phoneNumber : {
+    phone : {
         type: String,
         
     },
-    idCard : {
+    cnic : {
         type: String,
         
     },
@@ -24,7 +24,7 @@ const employeeSchema = new mongoose.Schema({
         type: String,
     },
     designation : {
-        type: Number,
+        type: String,
     
     rating:{
         type:Number,
