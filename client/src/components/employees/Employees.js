@@ -94,8 +94,11 @@ function Employees({ departments, loadDepartments }) {
                <TableCell>
                   <Avatar src={process.env.REACT_APP_BASE_URL  + "content/" + department._id + "/" + employee.profilePicture} />
                </TableCell>
+              
                <TableCell>
+                  <Link to={`/admin/employees/profile/${employee._id}`}>
                   {employee.name}
+                  </Link>
                </TableCell>
                <TableCell>
                   {employee.phone}
