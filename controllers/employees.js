@@ -76,36 +76,51 @@ router.post("/add", upload.single("profilePicture"), async (req, res) => {
     }
 })
 
-router.post("/edit", async (req, res) => {
+router.post("/edit", upload.single("profilePicture"), async (req, res) => {
     try {
 
         if (!req.body.id) throw new Error("employee id is required");
         if (!mongoose.isValidObjectId(req.body.id))
             throw new Error("employee id is invalid");
 
-        if (req.user.type !== userTypes.USER_TYPE__STANDARD)
-            throw new Error("invalid request");
-
-        const department = await Department.findOne({ user_id: req.user._id });
-        if (!department) throw new Error("Department does not exists");
-
-        if (req.user._id.toString() !== department.user_id.toString())
-            throw new Error("invalid request")
-
-
         const employee = await Employee.findById(req.body.id);
         if (!employee) throw new Error("employee does not exists");
 
+        if (req.user.type !== userTypes.USER_TYPE_SUPER && employee.departmentId.toString()  !== req.user.departmentId.toString())
+        throw new Error("invalid request ");
 
-        if (department._id.toString() !== employee.department_id.toString())
-            throw new Error("invalid request ");
+        const {
+            name,
+            email,
+            cnic,
+            designation,
+            phone,
+            address,
+        } = req.body
 
-        await Employee.updateOne(
-            { _id: employee._id, department_id: department._id },
-            { $set: req.body }
-        );
-        const updatedEmployee = await Employee.findById(req.body.id);
-        res.json({ employee: updatedEmployee })
+        const record = {
+            name,
+            email,
+            cnic,
+            designation,
+            phone,
+            address,
+            modifiedOn: new Date(),
+        }
+        if(req.file && req.file.filename)
+        {
+            record.profilePicture = req.file.filename;
+            if(employee.profilePicture && employee.profilePicture !== req.file.filename)
+                fs.access(`./content/${employee.departmentId}/${employee.profilePicture}`, require('fs').constants.F_OK).then( async () => {
+                    await fs.unlink(`./content/${employee.departmentId}/${employee.profilePicture}`);
+                }).catch(err => {
+
+                })
+        }
+
+
+        await Employee.findByIdAndUpdate(req.body.id, record)
+        res.json({ success: true })
 
 
     } catch (error) {
@@ -150,9 +165,20 @@ router.post("/search", async (req, res) => {
 
 
         const conditions = { departmentId: req.body.deptId};
-        const employees = await Employee.find(conditions);
+        if(req.body.query)
+        conditions['$text' ] = { $search: req.body.query}
 
-        res.status(200).json({ employees, department });
+        const page = req.body.page ? req.body.page: 1;
+        const skip = (page - 1) * process.env.RECORDS_PER_PAGE;
+
+        const employees =await Employee.find(conditions, {_id: 1, profilePicture: 1, name: 1, phone: 1, cnic: 1}, {limit : process.env.RECORDS_PER_PAGE, skip})
+
+        const totalEmployees = await Employee.countDocuments(conditions);
+        const numOfPages = Math.ceil(totalEmployees / process.env.RECORDS_PER_PAGE)
+
+
+
+        res.status(200).json({ employees, department,numOfPages });
 
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -161,30 +187,19 @@ router.post("/search", async (req, res) => {
 
 router.get("/details/:employee_id", async (req, res) => {
     try {
-
         if (!req.params.employee_id) throw new Error("employee id is required");
         if (!mongoose.isValidObjectId(req.params.employee_id))
             throw new Error("employee id is invalid");
 
-        if (req.user.type !== userTypes.USER_TYPE__STANDARD)
-            throw new Error("invalid request");
-
-        const department = await Department.findOne({ user_id: req.user._id });
-        if (!department) throw new Error("Department does not exists");
-
-        if (req.user._id.toString() !== department.user_id.toString())
-            throw new Error("invalid request")
-
-
         const employee = await Employee.findById(req.params.employee_id);
         if (!employee) throw new Error("employee does not exists");
 
+        if(req.user.type !== userTypes.USER_TYPE_SUPER && employee.departmentId.toString() !== req.user.departmentId.toString())
+        throw new Error("invalid Request")
 
-        if (department._id.toString() !== employee.department_id.toString())
-            throw new Error("invalid request ");
 
 
-        res.json(employee)
+        res.json({employee})
 
 
     } catch (error) {
