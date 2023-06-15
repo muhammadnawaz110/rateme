@@ -25,6 +25,7 @@ const employeeSchema = new mongoose.Schema({
     },
     designation : {
         type: String,
+        index: true,
     
     rating:{
         type:Number,
@@ -44,6 +45,9 @@ const employeeSchema = new mongoose.Schema({
         default: moment().format("YYYY-MM-DD")
     },
 });
+
+employeeSchema.index({ name: 'text', email: 'text', phone: 'text', cnic: 'text', designation: 'text' })
+
 const Employee = mongoose.model("employees", employeeSchema);
 
 module.exports = Employee

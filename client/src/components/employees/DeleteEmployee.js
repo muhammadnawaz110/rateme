@@ -7,7 +7,7 @@ import axios from 'axios';
 import { hideProgressBar } from '../../store/actions/progressBarActons';
 import { showError, showSuccess } from '../../store/actions/alertActions';
 
-export default function DeleteEmployee({ employeeId, name }) {
+export default function DeleteEmployee({ employeeId, name,deleteEmployee }) {
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const dispatch = useDispatch();
@@ -22,18 +22,7 @@ export default function DeleteEmployee({ employeeId, name }) {
 
     const open = Boolean(anchorEl);
     
-    const DeleteEmployee = () => {
-        axios.post('api/employees/delete', { id : employeeId }).then(({ data }) => {
-            if (data.success) {
-              dispatch(hideProgressBar())
-              dispatch(showSuccess('Employee deleted successfully'))
-            }
-          }).catch(error => {
-            dispatch(hideProgressBar())
-            let message = error && error.response && error.response.data ? error.response.data.error : error.message;
-            dispatch(showError(message))
-          })
-    }
+   
 
     return (
         <>
@@ -54,7 +43,7 @@ export default function DeleteEmployee({ employeeId, name }) {
                 <Typography sx={{ p: 2 }}>Employee  data will be deleted. Do you want to delete this <b>{name}</b> employee?</Typography>
                 <Box textAlign="center" pb={2}>
                     <Button onClose={handleClose}>Close</Button>
-                    <Button onClick={DeleteEmployee} sx={{ ml: 2 }} variant="contained" color="error">Delete</Button>
+                    <Button onClick={() => deleteEmployee(employeeId)} sx={{ ml: 2 }} variant="contained" color="error">Delete</Button>
                 </Box>
             </Popover>
         </>

@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Avatar, Box, Button, IconButton, Pagination, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { loadDepartments } from '../../store/actions/departmentActions'
@@ -8,20 +8,25 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import { hideProgressBar, showProgressBar } from '../../store/actions/progressBarActons';
 import axios from 'axios';
-import { showError } from '../../store/actions/alertActions';
+import { showError, showSuccess } from '../../store/actions/alertActions';
 import DeleteEmployee from './DeleteEmployee';
+import EmployeeQRCode from './EmployeeQRCode';
 
 function Employees({ departments, loadDepartments }) {
   const { deptId} = useParams()
   const dispatch = useDispatch();
   const [ department, setDepartment] = useState(null);
   const [employees, setEmployees] = useState([]);
+  const [page, setPage] = useState(1);
+  const[numOfPages, setNumOfPages] = useState(1)
+  const [query, setQuery ] = useState('')
   
   const loadEmployees = () => {
     dispatch(showProgressBar())
-    axios.post("/api/employees/search", { deptId }).then( result => {
+    axios.post("/api/employees/search", { deptId, page, query }).then( result => {
       setDepartment(result.data.department)
       setEmployees(result.data.employees)
+      setNumOfPages(result.data.numOfPages)
       dispatch(hideProgressBar())
     }).catch(error => {
       let message = error && error.response && error.response.data ? error.response.data.error : error.message;
@@ -29,9 +34,25 @@ function Employees({ departments, loadDepartments }) {
       dispatch(showError(message))
     })
   }
+
+  const deleteEmployee = (id) => {
+    axios.post('api/employees/delete', { id  }).then(({ data }) => {
+        if (data.success) {
+          dispatch(hideProgressBar())
+          dispatch(showSuccess('Employee deleted successfully'))
+          setEmployees( employees => employees.filter( item => item._id !== id))
+        }
+      }).catch(error => {
+        dispatch(hideProgressBar())
+        let message = error && error.response && error.response.data ? error.response.data.error : error.message;
+        dispatch(showError(message))
+      })
+}
+
+
   useEffect(() => {
     loadEmployees()
-  }, [])
+  }, [page])
   return (
     <Box>
 
@@ -41,6 +62,10 @@ function Employees({ departments, loadDepartments }) {
           <Button component={Link} to={`/admin/departments/edit/${deptId}`} variant='outlined' sx={{mr: 1}} startIcon={<EditIcon />}> Edit Department</Button>
           <Button component={Link} to={`/admin/employees/add/${deptId}`} variant='outlined' startIcon={<AddIcon />}> Add Employees</Button>
         </Box>
+      </Box>
+      <Box display={"flex"} justifyContent={'space-between'} mt={2}>
+        <TextField sx={{flexGrow:1, mr: 2}} placeholder='Search: Name, Email, Phone, Cnic, or designation...' size='small' onChange={(event) => {setQuery(event.target.value)}}/>
+        <Button variant='contained' onClick={loadEmployees}>Search</Button>
       </Box>
       <Table>
         <TableHead>
@@ -67,7 +92,7 @@ function Employees({ departments, loadDepartments }) {
             employees && employees .map(employee => (
               <TableRow key={employee._id}>               
                <TableCell>
-                  <Avatar src={process.env.REACT_APP_BASE_URL  + "content/" + department._id + "/" + employees.profilePicture} />
+                  <Avatar src={process.env.REACT_APP_BASE_URL  + "content/" + department._id + "/" + employee.profilePicture} />
                </TableCell>
                <TableCell>
                   {employee.name}
@@ -79,14 +104,19 @@ function Employees({ departments, loadDepartments }) {
                   {employee.cnic}
                </TableCell>
                <TableCell>
-                  <IconButton component={Link} to={`/admin/amployees/edit/${employee._id}`} > <EditIcon /> </IconButton>
-                  <DeleteEmployee employeeId={employee._id} name={employee.name}/>
+                  <IconButton component={Link} to={`/admin/employees/edit/${employee._id}`} > <EditIcon /> </IconButton>
+                  <DeleteEmployee employeeId={employee._id} name={employee.name} deleteEmployee={deleteEmployee}/>
+                  <EmployeeQRCode  employeeId={employee._id} name={employee.name}/>
                </TableCell>
               </TableRow>
             ))
           }
         </TableBody>
       </Table>
+
+      <Box mt={3} display='flex' justifyContent={'center'}>
+          <Pagination count={numOfPages} variant='outlined' color='primary' page={page} onChange={(event, value) => setPage(value)}/>
+      </Box>
      
     </Box>
   )
