@@ -5,6 +5,7 @@ import { hideProgressBar, showProgressBar } from '../../store/actions/progressBa
 import { showError } from '../../store/actions/alertActions';
 import axios from 'axios';
 import { Avatar, Box, Grid, Rating, Typography } from '@mui/material';
+import EmployeeFeedback from './EmployeeFeedback';
 
 export default function EmployeeProfile() {
     const { employeeId } = useParams()
@@ -42,6 +43,7 @@ export default function EmployeeProfile() {
         </Grid>
 
     </Grid>
+    <EmployeeFeedback employeeId={employeeId}/>
 </Box>
   )
 }

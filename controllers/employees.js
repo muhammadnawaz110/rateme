@@ -12,7 +12,7 @@ const { Stats } = require("fs");
 const Rating = require("../models/Rating");
 
 
-router.use(["/add", "/edit", "/delete", "/search", "/details/:employeeId", "/dashboard"], verifyUser);
+router.use(["/add", "/edit", "/delete", "/search", "/details/:employeeId", "/dashboard", "/rating"], verifyUser);
 
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
@@ -25,7 +25,9 @@ const storage = multer.diskStorage({
       }
     },
     filename: (req, file, cb) => {
-      cb(null, file.originalname);
+        const ext = path.extname(file.originalname);
+        const newFileName = Math.random().toString(36).substring(2,7);
+      cb(null, newFileName + ext);
     }
   })
   const upload = multer({
@@ -147,7 +149,22 @@ router.post('/delete', async (req, res) => {
 
         await Employee.findByIdAndDelete(req.body.id);
         if(employee.profilePicture)
-            await fs.unlink(`contant/${employee.departmentId}/${employee.profilePicture}`)
+            await fs.unlink(`content/${employee.departmentId}/${employee.profilePicture}`)
+
+        await Rating.deleteMany({ employeeId: req.body.id })
+
+        
+        const  result = await Rating.aggregate([
+            {$match: {departmentId: { $eq: employee.departmentId}}},
+            {$group: {_id: null, avg_value: {$avg: '$rating'}}}
+        ]);
+        if(result && result.length)
+        {
+            await Department.findByIdAndUpdate(employee.departmentId, {rating: result[0].avg_value.toFixed(1) })
+        }else
+        {
+            await Department.findByIdAndUpdate(employee.departmentId, { rating: 0});
+        }
 
         res.json({ success: true })
     } catch (err) {
@@ -346,6 +363,32 @@ router.post("/feedback", async (req, res) => {
         res.status(400).json({ error: err.message })
     }
 
+})
+
+router.post("/rating", async (req, res) => {
+    try {
+
+        if (req.user.type !== userTypes.USER_TYPE_SUPER && req.body.deptId !== req.user.departmentId.toString())
+            throw new Error("invalid request");
+
+        const conditions = { employeeId: req.body.employeeId};
+      
+
+        const page = req.body.page ? req.body.page: 1;
+        const skip = (page - 1) * process.env.RECORDS_PER_PAGE;
+
+        const rating =await Rating.find(conditions, { name: 1, phone: 1, message: 1, rating: 1, _id: 1}, {limit : process.env.RECORDS_PER_PAGE, skip})
+
+        const totalRatings = await Employee.countDocuments(conditions);
+        const numOfPages = Math.ceil(totalRatings / process.env.RECORDS_PER_PAGE)
+        console.log(numOfPages)
+
+
+        res.status(200).json({ rating, numOfPages });
+
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
 })
 
 module.exports = router
