@@ -251,7 +251,7 @@ router.post("/publickSearch", async (req, res) => {
 
         const filter = { departmentId: req.body.departmentId, name: {$regex: req.body.name, $options: 'i'}}
 
-        const employees =await Employee.find( filter, {_id: 1, profilePicture: 1, name: 1, phone: 1, cnic: 1})
+        const employees =await Employee.find( filter, {_id: 1, profilePicture: 1, name: 1, phone: 1, cnic: 1, departmentId: 1})
 
 
 
@@ -261,6 +261,91 @@ router.post("/publickSearch", async (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
+})
+
+router.get("/publicDetails/:employee_id", async (req, res) => {
+    try {
+        if (!req.params.employee_id) throw new Error("employee id is required");
+        if (!mongoose.isValidObjectId(req.params.employee_id))
+            throw new Error("employee id is invalid");
+
+        const employee = await Employee.findById(req.params.employee_id, {_id: 1, name: 1, departmentId: 1, profilePicture: 1});
+        if (!employee) throw new Error("employee does not exists");
+
+       
+
+
+        res.json({employee})
+
+
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+});
+
+router.post("/feedback", async (req, res) => {
+    try {
+        
+    if(!req.body.employeeId) 
+    throw new Error("Employee Id is required")
+
+    if(!req.body.rating) 
+    throw new Error("Rating is required")
+
+    if(!req.body.name) 
+    throw new Error("Name is required")
+
+    const employee = await Employee.findById(req.body.employeeId)
+    if (!employee)
+        throw new Error("Invalid Id");
+
+
+        const {
+            name,
+            phone,
+            message,
+            employeeId,
+            rating,
+        } = req.body
+        
+
+        if (rating < 0 || rating > 5)
+            throw new Error("Invalid Request")
+
+        const ratingData = Rating({
+            name,
+            phone,
+            message,
+            departmentId: employee.departmentId,
+            employeeId,
+            rating,
+            createdOn: new Date()
+        })
+        await ratingData.save()
+        let result = await Rating.aggregate([
+            {$match: {departmentId: { $eq: employee.departmentId}}},
+            {$group: {_id: null, avg_value: {$avg: '$rating'}}}
+        ]);
+        if(result && result.length)
+        {
+            await Employee.findByIdAndUpdate(employeeId, {rating: result[0].avg_value.toFixed(1) });
+        }
+
+        result = await Rating.aggregate([
+            {$match: {departmentId: { $eq: employee.departmentId}}},
+            {$group: {_id: null, avg_value: {$avg: '$rating'}}}
+        ]);
+        if(result && result.length)
+        {
+            await Department.findByIdAndUpdate(employee.departmentId, {rating: result[0].avg_value.toFixed(1) })
+        }
+
+        res.json({ success: true })
+
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+
 })
 
 module.exports = router

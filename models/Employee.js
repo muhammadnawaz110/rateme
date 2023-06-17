@@ -26,11 +26,12 @@ const employeeSchema = new mongoose.Schema({
     designation : {
         type: String,
         index: true,
-    
+    },
+
     rating:{
         type:Number,
-    }
     },
+
     departmentId:{
         type: mongoose.Schema.Types.ObjectId
     },

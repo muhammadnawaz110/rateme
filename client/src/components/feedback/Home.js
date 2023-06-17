@@ -1,4 +1,4 @@
-import { Box, Button, Grid } from '@mui/material'
+import { Avatar, Box, Button, Card, CardActionArea, CardContent, Grid, Typography } from '@mui/material'
 import axios from 'axios';
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -7,10 +7,15 @@ import { showError } from '../../store/actions/alertActions';
 import { Field, Form } from 'react-final-form';
 import TextInput from '../library/form/TextInput';
 import SelectInput from '../library/form/SelectInput';
+import { Link } from 'react-router-dom';
+import ProgressBar from '../library/ProgressBar';
+import ScanQRCode from './ScanQRCode';
 
 export default function Home() {
     const dispatch = useDispatch();
     const [departments, setDepartments] = useState([])
+    const [employees, setEmployees] = useState([])
+    const [isSearchDone, setSearchDone] = useState(false)
 
     useEffect(() => {
         dispatch(showProgressBar())
@@ -37,7 +42,8 @@ export default function Home() {
             try {
                 dispatch(showProgressBar())
                 let result = await axios.post("api/employees/publickSearch", data);
-                console.log(result.data.employees)
+                setEmployees(result.data.employees)
+                setSearchDone(true)
                 dispatch(hideProgressBar())
     
             } catch (error) {
@@ -57,7 +63,7 @@ export default function Home() {
 
 
   return (
-   <Box width='100%' minHeight='90%' p={4}>
+   <Box width='100%' minHeight='90%' p={4} alignSelf={'baseline'}>
          <Form
                 onSubmit={searchEmploys}
                 validate={validate}
@@ -85,6 +91,7 @@ export default function Home() {
                                     type="submit"
                                     disabled={invalid || submitting}
                                 >Search</Button>
+                                <ScanQRCode />
                                 </Grid>
                         </Grid>
                             
@@ -96,6 +103,34 @@ export default function Home() {
                     </form>
                 )}
             />
+            
+                <ProgressBar />
+                <Grid container spacing={2}>
+
+                    {
+                        employees.map(employee => (
+                        <Grid item lg={2} md={3} sm={4} xs={12} key={employee._id}>
+                             <Card sx={{maxWidth: '100%'}} >
+                                <CardActionArea component={Link} to={`/employee/feedback/${employee._id}`}>
+                                <Avatar variant="square" sx={{width:"100%", height:"auto"}} src={process.env.REACT_APP_BASE_URL + 'content/'+ employee.departmentId +'/' + employee.profilePicture} />
+                                </CardActionArea>
+                                <CardContent>
+                                <Typography gutterBottom variant="h6" textAlign="center" component="div"> {employee.name}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        ))
+                    }
+                </Grid>
+                {
+                   isSearchDone && employees.length === 0 &&
+                    <Box textAlign='center' mt={3}>
+                        <Typography variant='h5'>
+                            Employees Not found
+                        </Typography>
+                    </Box>
+                }
+            
    </Box>
   )
 
