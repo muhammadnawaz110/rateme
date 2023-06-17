@@ -12,6 +12,7 @@ const app = express();
 app.use(express.json())
 app.use(cors())
 app.use('/content', express.static('content/'));
+app.use( express.static(__dirname + '/client/build'));
 app.use("/api/departments", departmentsRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/employees", employeesRoutes)
@@ -28,7 +29,7 @@ app.get('/test', (req, res) =>{
 })
 
 app.all('*', (req, res) =>{
-    res.send('page Not Found')
+    res.sendFile(__dirname + '/client/build/index.html')
 });
 app.use((err, req, res, next ) => {
     if(err){
@@ -38,6 +39,6 @@ app.use((err, req, res, next ) => {
     }
 })
 
-app.listen(5000, function() {
+app.listen( process.env.PORT || 5000, function() {
     console.log('server is listening at 5000')
 })
